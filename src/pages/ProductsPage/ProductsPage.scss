@@ -1,0 +1,228 @@
+$bg: #0b0f19;
+$panel: rgba(255, 255, 255, 0.03);
+$border: rgba(255, 255, 255, 0.10);
+$text: #e7eaf3;
+$primary: rgba(99, 102, 241, 0.55);
+$primaryBg: rgba(99, 102, 241, 0.18);
+$danger: rgba(239, 68, 68, 0.45);
+$dangerBg: rgba(239, 68, 68, 0.12);
+
+@mixin card($radius: 12px) {
+    border-radius: $radius;
+    border: 1px solid $border;
+    background: $panel;
+    backdrop-filter: blur(10px);
+}
+
+@mixin flex-center() {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin container($w: 1100px) {
+    max-width: $w;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: $bg;
+    color: $text;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.header {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid $border;
+
+    &__inner {
+        @include container();
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.main {
+    flex: 1;
+    padding: 40px 0;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.product-item {
+    @include card();
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: translateY(-5px);
+        border-color: $primary;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    &__category {
+        font-size: 0.75rem;
+        opacity: 0.6;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    &__id {
+        font-size: 0.7rem;
+        opacity: 0.4;
+        font-family: monospace;
+    }
+
+    &__name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 5px 0;
+    }
+
+    &__description {
+        font-size: 0.9rem;
+        opacity: 0.7;
+        line-height: 1.5;
+        flex-grow: 1;
+    }
+
+    &__price {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    &__stock {
+        font-size: 0.85rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    &__footer {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: 0.2s;
+
+    &--primary {
+        background: $primaryBg;
+        border-color: $primary;
+        color: #fff;
+    }
+
+    &--danger {
+        background: $dangerBg;
+        border-color: $danger;
+        color: #fff;
+    }
+
+    &:hover {
+        filter: brightness(1.2);
+    }
+}
+
+// Modal styles
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    @include flex-center();
+    z-index: 1000;
+}
+
+.modal {
+    @include card(16px);
+    background: #0f172a;
+    width: 90%;
+    max-width: 500px;
+    padding: 24px;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    &__title {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    label {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+
+    input,
+    textarea {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid $border;
+        padding: 10px;
+        color: #fff;
+        border-radius: 6px;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+        }
+    }
+}

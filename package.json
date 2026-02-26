@@ -1,31 +1,40 @@
 {
   "name": "frontend-and-backend-practice",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Store practice project",
+  "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "node app.js",
-    "build-sass": "sass style.scss style.css",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "node app.js",
+    "client": "npm run start",
+    "start": "set PORT=3001 && react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pkda1lu/frontend-and-backend-practice-sem2.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/pkda1lu/frontend-and-backend-practice-sem2/issues"
-  },
-  "homepage": "https://github.com/pkda1lu/frontend-and-backend-practice-sem2#readme",
   "dependencies": {
     "axios": "^1.13.5",
-    "express": "^5.2.1"
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "nanoid": "^5.1.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1"
   },
   "devDependencies": {
     "sass": "^1.97.3"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
