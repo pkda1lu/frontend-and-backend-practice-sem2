@@ -1,0 +1,100 @@
+// 1. Переменные (согласно методичке)
+$primary-color: #3498db;
+$accent-color: #2ecc71;
+$text-color: #2c3e50;
+$bg-card: #ffffff;
+$border-radius: 12px;
+$font-family: 'Inter', sans-serif;
+
+// 2. Миксины (согласно методичке)
+@mixin flex-center() {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin button-styles($color) {
+    padding: 10px 24px;
+    background-color: $color;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s ease;
+    
+    &:hover {
+        background-color: darken($color, 10%);
+    }
+}
+
+// Базовые стили
+body {
+    background-color: #f4f7f6;
+    font-family: $font-family;
+    @include flex-center();
+    min-height: 100vh;
+    margin: 0;
+}
+
+// 3. Вложенная структура (согласно методичке)
+.product-card {
+    background: $bg-card;
+    border-radius: $border-radius;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: translateY(-5px);
+    }
+
+    &__image-wrapper {
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        background: #f9f9f9;
+        @include flex-center();
+    }
+
+    &__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &__content {
+        padding: 24px;
+    }
+
+    &__title {
+        font-size: 1.5rem;
+        color: $text-color;
+        margin: 0 0 12px 0;
+    }
+
+    &__description {
+        font-size: 0.95rem;
+        color: lighten($text-color, 20%);
+        line-height: 1.6;
+        margin-bottom: 24px;
+    }
+
+    &__footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $text-color;
+    }
+}
+
+.btn {
+    &--primary {
+        @include button-styles($primary-color);
+    }
+}
