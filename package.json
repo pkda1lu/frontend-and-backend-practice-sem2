@@ -1,0 +1,30 @@
+{
+  "name": "frontend-and-backend-practice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js",
+    "build-sass": "sass style.scss style.css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pkda1lu/frontend-and-backend-practice-sem2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/pkda1lu/frontend-and-backend-practice-sem2/issues"
+  },
+  "homepage": "https://github.com/pkda1lu/frontend-and-backend-practice-sem2#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "sass": "^1.97.3"
+  }
+}
