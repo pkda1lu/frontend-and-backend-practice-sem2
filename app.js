@@ -1,24 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const { nanoid } = require('nanoid');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
 const app = express();
 const port = 3000;
 
-// Исходные данные: 10 товаров
-let products = [
-    { id: nanoid(6), name: "CyberVision XR", category: "VR/AR", description: "Очки дополненной реальности с 12K разрешением.", price: 125000, stock: 5 },
-    { id: nanoid(6), name: "NeuralLink Solo", category: "Нейроинтерфейсы", description: "Беспроводной чип для управления умным домом мыслями.", price: 89000, stock: 12 },
-    { id: nanoid(6), name: "GravityBoard G1", category: "Транспорт", description: "Ховерборд на магнитной подушке.", price: 45000, stock: 7 },
-    { id: nanoid(6), name: "CryoCooler Pro", category: "Аксессуары", description: "Портативный охладитель напитков на жидком азоте.", price: 15000, stock: 20 },
-    { id: nanoid(6), name: "HoloDisplay X", category: "Мониторы", description: "Голографический проекционный экран.", price: 65000, stock: 3 },
-    { id: nanoid(6), name: "PocketStar Mini", category: "Смартфоны", description: "Сверхкомпактный гибкий смартфон.", price: 55000, stock: 15 },
-    { id: nanoid(6), name: "AeroDron S1", category: "Дроны", description: "Бесшумный дрон с ИИ-пилотированием.", price: 92000, stock: 4 },
-    { id: nanoid(6), name: "BioSense Watch", category: "Носимая электроника", description: "Часы с полным анализом состава крови.", price: 34000, stock: 25 },
-    { id: nanoid(6), name: "PulseCore Z", category: "Аудио", description: "Акустическая система, передающая звук через вибрацию костей.", price: 21000, stock: 10 },
-    { id: nanoid(6), name: "TitanPad Ultra", category: "Планшеты", description: "Планшет с прозрачным графеновым дисплеем.", price: 110000, stock: 6 }
-];
-
-// Настройка парсинга JSON ПЕРЕД маршрутами
+// Middleware для парсинга JSON
 app.use(express.json());
 
 // CORS настройка
@@ -28,7 +17,7 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// Middleware для логирования
+// Middleware для логирования запросов (согласно методичке)
 app.use((req, res, next) => {
     res.on('finish', () => {
         console.log(`[${new Date().toISOString()}] [${req.method}] ${res.statusCode} ${req.path}`);
@@ -39,70 +28,254 @@ app.use((req, res, next) => {
     next();
 });
 
-// Вспомогательная функция
-function findProductOr404(id, res) {
-    const product = products.find(p => p.id === id);
-    if (!product) {
-        res.status(404).json({ error: "Product not found" });
+// Исходные данные (согласно методичке)
+let users = [
+    { id: nanoid(6), name: 'Петр', age: 16 },
+    { id: nanoid(6), name: 'Иван', age: 18 },
+    { id: nanoid(6), name: 'Дарья', age: 20 }
+];
+
+// Swagger definition
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'API управления пользователями',
+            version: '1.0.0',
+            description: 'Простое API для управления пользователями (Практика №5)',
+        },
+        servers: [
+            {
+                url: `http://localhost:${port}`,
+                description: 'Локальный сервер',
+            },
+        ],
+    },
+    apis: ['./app.js'], // Путь к файлу с JSDoc
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Проверка работоспособности сервера
+app.get('/', (req, res) => res.send('Сервер запущен. Документация: /api-docs'));
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - name
+ *         - age
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: Автоматически сгенерированный уникальный ID
+ *         name:
+ *           type: string
+ *           description: Имя пользователя
+ *         age:
+ *           type: integer
+ *           description: Возраст пользователя
+ *       example:
+ *         id: "abc123"
+ *         name: "Петр"
+ *         age: 16
+ */
+
+// Помощник (согласно методичке)
+function findUserOr404(id, res) {
+    const user = users.find(u => u.id === id);
+    if (!user) {
+        res.status(404).json({ error: "User not found" });
         return null;
     }
-    return product;
+    return user;
 }
 
-// REST Маршруты для товаров
-app.get('/api/products', (req, res) => res.json(products));
-
-app.get('/api/products/:id', (req, res) => {
-    const product = findProductOr404(req.params.id, res);
-    if (product) res.json(product);
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Возвращает список всех пользователей
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Список пользователей
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ */
+app.get("/api/users", (req, res) => {
+    res.json(users);
 });
 
-app.post('/api/products', (req, res) => {
-    const { name, category, description, price, stock } = req.body || {};
-    if (!name) return res.status(400).json({ error: "Name is required" });
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Получает пользователя по ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID пользователя
+ *     responses:
+ *       200:
+ *         description: Данные пользователя
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: Пользователь не найден
+ */
+app.get("/api/users/:id", (req, res) => {
+    const user = findUserOr404(req.params.id, res);
+    if (user) res.json(user);
+});
 
-    const newProduct = {
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Создает нового пользователя
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - age
+ *             properties:
+ *               name:
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Пользователь успешно создан
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Ошибка в теле запроса (имя или возраст отсутствуют)
+ */
+app.post("/api/users", (req, res) => {
+    const { name, age } = req.body || {};
+    if (!name || age === undefined) {
+        return res.status(400).json({ error: "Name and age are required" });
+    }
+    const newUser = {
         id: nanoid(6),
         name: name.trim(),
-        category: (category || "").trim(),
-        description: (description || "").trim(),
-        price: Number(price) || 0,
-        stock: Number(stock) || 0
+        age: Number(age)
     };
-    products.push(newProduct);
-    res.status(201).json(newProduct);
+    users.push(newUser);
+    res.status(201).json(newUser);
 });
 
-app.patch('/api/products/:id', (req, res) => {
-    const product = findProductOr404(req.params.id, res);
-    if (!product) return;
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   patch:
+ *     summary: Обновляет данные пользователя
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID пользователя
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Обновленный пользователь
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Нет данных для обновления
+ *       404:
+ *         description: Пользователь не найден
+ */
+app.patch("/api/users/:id", (req, res) => {
+    const user = findUserOr404(req.params.id, res);
+    if (!user) return;
 
-    const { name, category, description, price, stock } = req.body || {};
-    if (name !== undefined) product.name = name.trim();
-    if (category !== undefined) product.category = category.trim();
-    if (description !== undefined) product.description = description.trim();
-    if (price !== undefined) product.price = Number(price);
-    if (stock !== undefined) product.stock = Number(stock);
-
-    res.json(product);
-});
-
-app.delete('/api/products/:id', (req, res) => {
-    const id = req.params.id;
-    if (!products.some(p => p.id === id)) {
-        return res.status(404).json({ error: "Product not found" });
+    if (req.body?.name === undefined && req.body?.age === undefined) {
+        return res.status(400).json({ error: "Nothing to update" });
     }
-    products = products.filter(p => p.id !== id);
+
+    const { name, age } = req.body;
+    if (name !== undefined) user.name = name.trim();
+    if (age !== undefined) user.age = Number(age);
+
+    res.json(user);
+});
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Удаляет пользователя
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID пользователя
+ *     responses:
+ *       204:
+ *         description: Пользователь успешно удален (нет тела ответа)
+ *       404:
+ *         description: Пользователь не найден
+ */
+app.delete("/api/users/:id", (req, res) => {
+    const id = req.params.id;
+    if (!users.some(u => u.id === id)) {
+        return res.status(404).json({ error: "User not found" });
+    }
+    users = users.filter(u => u.id !== id);
     res.status(204).send();
 });
 
-// Ошибка 404 для всех остальных маршрутов
+// Глобальный 404
 app.use((req, res) => res.status(404).json({ error: "Not found" }));
 
-// Глобальный обработчик ошибок
+// Обработчик ошибок
 app.use((err, req, res, next) => {
     console.error("Unhandled error:", err);
     res.status(500).json({ error: "Internal server error" });
 });
 
-app.listen(port, () => console.log(`Сервер магазина на http://localhost:${port}`));
+app.listen(port, () => {
+    console.log(`Сервер запущен на http://localhost:${port}`);
+    console.log(`Swagger UI доступен по адресу http://localhost:${port}/api-docs`);
+});

@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from "react";
-import "./ProductsPage.scss";
+import "./UsersPage.scss";
 import { api } from "../../api";
-import ProductItem from "../../components/ProductItem";
-import ProductModal from "../../components/ProductModal";
+import UserItem from "../../components/UserItem";
+import UserModal from "../../components/UserModal";
 
-export default function ProductsPage() {
-    const [products, setProducts] = useState([]);
+export default function UsersPage() {
+    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState("create");
-    const [editingProduct, setEditingProduct] = useState(null);
+    const [editingUser, setEditingUser] = useState(null);
 
     useEffect(() => {
-        loadProducts();
+        loadUsers();
     }, []);
 
-    const loadProducts = async () => {
+    const loadUsers = async () => {
         try {
             setLoading(true);
-            const data = await api.getProducts();
-            setProducts(data);
+            const data = await api.getUsers();
+            setUsers(data);
         } catch (err) {
             console.error(err);
-            alert("Ошибка загрузки товаров");
+            alert("Ошибка загрузки пользователей");
         } finally {
             setLoading(false);
         }
@@ -30,21 +30,21 @@ export default function ProductsPage() {
 
     const openCreate = () => {
         setModalMode("create");
-        setEditingProduct(null);
+        setEditingUser(null);
         setModalOpen(true);
     };
 
-    const openEdit = (product) => {
+    const openEdit = (user) => {
         setModalMode("edit");
-        setEditingProduct(product);
+        setEditingUser(user);
         setModalOpen(true);
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Удалить товар?")) return;
+        if (!window.confirm("Удалить пользователя?")) return;
         try {
-            await api.deleteProduct(id);
-            setProducts(prev => prev.filter(p => p.id !== id));
+            await api.deleteUser(id);
+            setUsers(prev => prev.filter(u => u.id !== id));
         } catch (err) {
             alert("Ошибка удаления");
         }
@@ -53,11 +53,11 @@ export default function ProductsPage() {
     const handleSubmitModal = async (payload) => {
         try {
             if (modalMode === "create") {
-                const newProduct = await api.createProduct(payload);
-                setProducts(prev => [...prev, newProduct]);
+                const newUser = await api.createUser(payload);
+                setUsers(prev => [...prev, newUser]);
             } else {
-                const updated = await api.updateProduct(payload.id, payload);
-                setProducts(prev => prev.map(p => p.id === payload.id ? updated : p));
+                const updated = await api.updateUser(payload.id, payload);
+                setUsers(prev => prev.map(u => u.id === payload.id ? updated : u));
             }
             setModalOpen(false);
         } catch (err) {
@@ -69,24 +69,24 @@ export default function ProductsPage() {
         <div className="page">
             <header className="header">
                 <div className="header__inner">
-                    <div className="brand">NeoStore 2026 Admin</div>
-                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>React + Express CRUD</div>
+                    <div className="brand">Users App [Task #5]</div>
+                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>Swagger Integrated API</div>
                 </div>
             </header>
 
             <main className="main">
                 <div className="container">
                     <div className="toolbar">
-                        <h1>Список товаров</h1>
-                        <button className="btn btn--primary" onClick={openCreate}>+ Добавить товар</button>
+                        <h1>Пользователи</h1>
+                        <button className="btn btn--primary" onClick={openCreate}>+ Создать</button>
                     </div>
 
                     {loading ? (
-                        <div style={{ textAlign: 'center', opacity: 0.5 }}>Загрузка товаров...</div>
+                        <div style={{ textAlign: 'center', opacity: 0.5 }}>Загрузка...</div>
                     ) : (
                         <div className="list">
-                            {products.map(p => (
-                                <ProductItem key={p.id} product={p} onEdit={openEdit} onDelete={handleDelete} />
+                            {users.map(u => (
+                                <UserItem key={u.id} user={u} onEdit={openEdit} onDelete={handleDelete} />
                             ))}
                         </div>
                     )}
@@ -95,14 +95,14 @@ export default function ProductsPage() {
 
             <footer className="header" style={{ borderBottom: 'none', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                 <div className="header__inner" style={{ fontSize: '13px', opacity: 0.6 }}>
-                    © {new Date().getFullYear()} NeoStore 2026. Практическая работа №4.
+                    © {new Date().getFullYear()} Users Admin. Практическая работа №5.
                 </div>
             </footer>
 
-            <ProductModal
+            <UserModal
                 open={modalOpen}
                 mode={modalMode}
-                initialProduct={editingProduct}
+                initialUser={editingUser}
                 onClose={() => setModalOpen(false)}
                 onSubmit={handleSubmitModal}
             />
